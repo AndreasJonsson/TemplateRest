@@ -1,0 +1,9 @@
+{
+	"@metadata": {
+		"authors": [
+			"Andreas Jonsson"
+		]
+	},
+        "templaterest": "TemplateRest",
+        "templaterest-desc": "Restful service for editing template transclusions."
+}

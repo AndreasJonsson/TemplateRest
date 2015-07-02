@@ -1,0 +1,14 @@
+# Editors
+*~
+*.kate-swp
+.*.swp
+sublime-*
+.project
+.settings
+
+# OS
+.DS_Store
+
+# Deployment configuration
+/deploy.conf
+
