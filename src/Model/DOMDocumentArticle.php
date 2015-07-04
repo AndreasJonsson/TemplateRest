@@ -2,7 +2,7 @@
 
 namespace TemplateRest\Model;
 
-class DOMDocumentArticle implements Article, ModificationListener
+class DOMDocumentArticle implements Article
 {
 
 	/**
@@ -11,11 +11,6 @@ class DOMDocumentArticle implements Article, ModificationListener
 	private $domDocument = null;
 
 	private $transclusions;
-
-	/**
-	 * @var int
-	 */
-	private $dirtyCounter;
 
 	/**
 	 * Set the xhtml contents of the article.
@@ -93,7 +88,7 @@ class DOMDocumentArticle implements Article, ModificationListener
 			$data->parts = array( $obj );
 			$e->setAttribute('mw-data', \json_encode( $data ) );
 			$this->domDoc->getElementsByTagName( 'body' )->item(0)->appendChild( $e );
-			$this->transclusions[$target][] = new DOMElementTransclusion( $this, $target, $e, $index, 0 );
+			$this->transclusions[$target][] = new DOMElementTransclusion( $target, $e, $index, 0 );
 		}
 
 		return $this->transclusions[$target][$index];
@@ -114,7 +109,6 @@ class DOMDocumentArticle implements Article, ModificationListener
 						$this->transclusions[$target] = array();
 					}
 					$this->transclusions[$target][] = new DOMElementTransclusion(
-						$this,
 						$target,
 						$transclusionElement,
 						count($this->transclusions[$target]),
@@ -131,21 +125,6 @@ class DOMDocumentArticle implements Article, ModificationListener
 			return substr($targetObj->href, 2);
 		}
 		return $targetObj->wt;
-	}
-
-	public function dirty()
-	{
-		$this->dirtyCounter++;
-	}
-
-	public function clean()
-	{
-		$this->dirtyCounter--;
-	}
-
-	public function isDirty()
-	{
-		return $this->dirtyCounter > 0;
 	}
 
 }

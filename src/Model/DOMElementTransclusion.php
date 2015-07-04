@@ -16,19 +16,14 @@ class DOMElementTransclusion implements Transclusion
 
 	private $partIndex;
 
-	private $modificationListener;
-
 	private $dirty = false;
 
-	private $originalParameters = null;
-
-	function __construct( ModificationListener $modificationListener, $target, \DOMElement &$domElement, $index, $partIndex )
+	function __construct( $target, \DOMElement &$domElement, $index, $partIndex )
 	{
 		$this->target = $target;
 		$this->domElement = $domElement;
 		$this->index = $index;
 		$this->partIndex = $partIndex;
-		$this->modificationListener = $modificationListener;
 	}
 
 	/**
@@ -49,18 +44,9 @@ class DOMElementTransclusion implements Transclusion
 	{
 		$dataMw = \json_decode($this->domElement->getAttribute('data-mw'));
 
-		if ($this->originalParameters === null) {
-			$this->originalParameters = clone($dataMw->parts[$this->partIndex]->params);
-		}
-
 		$dataMw->parts[$this->partIndex]->params = $parameterData;
 
-		if ($this->paramsUpdated($parameterData)) {
-			$this->domElement->setAttribute('data-mw', \json_encode($dataMw) );
-			$this->dirty();
-		} else {
-			$this->clean();
-		}
+		$this->domElement->setAttribute('data-mw', \json_encode($dataMw) );
 	}
 
 	/**
@@ -73,10 +59,6 @@ class DOMElementTransclusion implements Transclusion
 	{
 		$dataMw = \json_decode($this->domElement->getAttribute('data-mw'));
 
-		if ($this->originalParameters === null) {
-			$this->originalParameters = clone($dataMw->parts[$this->partIndex]->params);
-		}
-
 		foreach ( get_object_vars( $parameterData ) as $paramName => $paramInfo ) {
 			$dataMw->parts[$this->partIndex]->params->{$paramName} = $paramInfo;
 		}
@@ -85,12 +67,7 @@ class DOMElementTransclusion implements Transclusion
 			unset($dataMw->parts[$this->partIndex]->params->{$remove});
 		}
 
-		if ($this->paramsUpdated($dataMw->parts[$this->partIndex]->params) ) {
-			$this->domElement->setAttribute('data-mw', \json_encode($dataMw) );
-			$this->dirty();
-		} else {
-			$this->clean();
-		}
+		$this->domElement->setAttribute('data-mw', \json_encode($dataMw) );
 	}
 
 	/**
@@ -101,67 +78,4 @@ class DOMElementTransclusion implements Transclusion
 		return $this->target;
 	}
 
-	private function paramsUpdated( $parameterData )
-	{
-		return ! self::objects_equal( $this->originalParameters, $parameterData );
-	}
-
-	private function dirty()
-	{
-		if (!$this->dirty) {
-			$this->dirty = true;
-			$this->modificationListener->dirty();
-		}
-	}
-
-	private function clean()
-	{
-		if ($this->dirty) {
-			$this->dirty = true;
-			$this->modificationListener->clean();
-		}
-	}
-
-	private static function objects_equal($a, $b)
-	{
-		if ( \is_object($a) ) {
-			if ( !\is_object($b) ) {
-				return false;
-			}
-			$avars = get_object_vars( $a );
-			$bvars = get_object_vars( $b );
-			if ( count($avars) != count($bvars) ) {
-				return false;
-			}
-			foreach ( $avars as $var => $aval ) {
-				if ( isset( $a->{$var} ) && !isset( $b->{$var} ) ) {
-					return false;
-				}
-				if ( !isset( $b->{$var} ) ) {
-					continue;
-				}
-				if ( !self::objects_equal($aval, $b->{$var}) ) {
-					return false;
-				}
-			}
-			return true;
-		}  elseif ( \is_array($a) ) {
-			if ( \length( $a ) != \length( $b ) ) {
-				return false;
-			}
-			foreach ( $a as $key => $val ) {
-				if ( isset( $a[$key] ) && !isset( $b[$key] ) ) {
-					return false;
-				}
-				if ( !isset( $b[$key] ) ) {
-					continue;
-				}
-				if ( !self::objects_equal($val, $b[$key]) ) {
-					return false;
-				}
-			}
-			return true;
-		}
-		return $a === $b;
-	}
 }

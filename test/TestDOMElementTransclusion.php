@@ -9,7 +9,6 @@ class TestDOMElementTransclusion extends \PHPUnit_Framework_TestCase
 
 	private function getTransclusion( $xml, $index, $partIndex, $isFile=false )
 	{
-		$ml = $this->getMockBuilder('TemplateRest\Model\ModificationListener')->setMethods( array( 'dirty', 'clean' ) )->getMock();
 		$domDoc = new \DOMDocument();
 
 		if ($isFile) {
@@ -28,17 +27,14 @@ class TestDOMElementTransclusion extends \PHPUnit_Framework_TestCase
 
 		$target = $data->parts[$partIndex]->target->wt;
 		
-		$t = new DOMElementTransclusion( $ml, $target, $transclusion, $index, $partIndex );
+		$t = new DOMElementTransclusion( $target, $transclusion, $index, $partIndex );
 
-		return array($t, $domDoc, $ml);
+		return array($t, $domDoc );
 	}
 
 	public function test()
 	{
-		list($t, $domDoc, $ml) = $this->getTransclusion( 'Test1.xml', 0, 0, true );
-
-		$ml->expects( $this->once() )
-			->method('dirty');
+		list($t, $domDoc ) = $this->getTransclusion( 'Test1.xml', 0, 0, true );
 
 		$params = $t->getParameters();
 
