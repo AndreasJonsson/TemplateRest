@@ -78,4 +78,28 @@ class DOMElementTransclusion implements Transclusion
 		return $this->target;
 	}
 
+	/**
+	 * Remove this transclusion.
+	 */
+	public function remove()
+	{
+		$dataMw = \json_decode($this->domElement->getAttribute('data-mw'));
+
+		array_splice( $dataMw->parts, $this->partIndex, 1 );
+
+		if ( count($dataMw->parts) === 0 ) {
+			$about = $this->domElement->getAttribute( 'about' );
+			$this->domElement->parentNode->removeChild( $this->domElement );
+			if ( !empty( $about ) ) {
+				$xpath = new \DOMXPath( $this->domElement->ownerDocument );
+				$nodeList = $xpath->query( '/body//*[@about="' . $about . '"]' );
+				for ( $i = 0; $i < $nodeList->length; $i++ ) {
+					$node = $nodeList->item( $i );
+					$node->parentNode->removeChild( $node );
+				}
+			}
+		} else {
+			$this->domElement->setAttribute( 'data-mw', \json_encode($dataMw) );
+		}
+	}
 }

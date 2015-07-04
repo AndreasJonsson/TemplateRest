@@ -94,6 +94,24 @@ class DOMDocumentArticle implements Article
 		return $this->transclusions[$target][$index];
 	}
 
+	/**
+	 * Remove the occurence of the target template tranclusion corresponding to $index.
+	 * 
+	 * @param string $target
+	 * @param int $index
+	 */
+	public function removeTransclusion( $target, $index )
+	{
+		$n = $this->getNumberOfTransclusions( $target );
+		if ( $n <= $index ) {
+			throw new Exception( 'No transclusion of ' . $target . ' with index ' . $index . ' in this article.');
+		}
+
+		$this->transclusions[$target][$index]->remove();
+		array_splice( $this->transclusions[$target], $index, 1 );
+	}
+
+
 	private function addtransclusionElement( $transclusionElement )
 	{
 		$dataMw = $transclusionElement->getAttribute('data-mw');

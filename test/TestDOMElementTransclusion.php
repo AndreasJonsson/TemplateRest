@@ -89,4 +89,24 @@ class TestDOMElementTransclusion extends \PHPUnit_Framework_TestCase
 		$this->assertEquals( array_keys(get_object_vars($t2->getParameters())), array( '0' => '1' ) );
 	}
 
+	public function testRemove()
+	{
+		list($t, $domDoc) = $this->getTransclusion( 'Test1.xml', 0, 0, true );
+		$t->remove();
+
+		$newDoc = new \DOMDocument();
+
+		$newDoc->loadXML( $domDoc->saveXML() );
+
+		$xpath = new \DOMXPath( $newDoc );
+
+		$transclusionElements = $xpath->query( '/body//span[@typeof="mw:Transclusion"]' );
+
+		$this->assertEquals( $transclusionElements->length, 0 );
+
+		$templateElements = $xpath->query( '/body//span[@about="#mwt1"]' );
+
+		$this->assertEquals( $templateElements->length, 0 );
+	}
+
 }

@@ -30,4 +30,8 @@ interface Transclusion
 	 */
 	function getTarget();
 
+	/**
+	 * Remove this transclusion.
+	 */
+	function remove();
 }
