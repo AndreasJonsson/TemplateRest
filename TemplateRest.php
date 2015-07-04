@@ -34,7 +34,9 @@ $wgExtensionCredits['other'][] = array(
 
 $wgMessagesDirs['TemplateRest'] = __DIR__ . '/i18n';
 
+$wgAPIModules['templaterest'] = 'ApiTemplateRest';
 
+$wgAutoloadClasses['ApiTemplateRest'] = __DIR__ . '/ApiTemplateRest.php';
 
 /*
 

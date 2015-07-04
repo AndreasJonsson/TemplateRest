@@ -1,0 +1,8 @@
+<phpunit bootstrap="test/bootstrap.php">
+  <testsuites>
+    <testsuite name="model">
+      <file>test/TestDOMElementTransclusion.php</file>
+      <file>test/TestDOMDocumentArticle.php</file>
+    </testsuite>
+  </testsuites>
+</phpunit>

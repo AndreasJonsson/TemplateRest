@@ -5,5 +5,7 @@
 		]
 	},
         "templaterest": "TemplateRest",
-        "templaterest-desc": "Restful service for editing template transclusions."
+        "templaterest-desc": "Restful service for editing template transclusions.",
+        "apihelp-templaterest-description": "Restful service for editing template transclusions.",
+        "apihelp-templaterest-param-title": "Title of page to edit."
 }
