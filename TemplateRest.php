@@ -34,20 +34,6 @@ $wgExtensionCredits['other'][] = array(
 
 $wgMessagesDirs['TemplateRest'] = __DIR__ . '/i18n';
 
-$wgAPIModules['templaterest'] = 'ApiTemplateRest';
+$wgAPIModules['templaterest'] = 'TemplateRest\ApiTemplateRest';
 
-$wgAutoloadClasses['ApiTemplateRest'] = __DIR__ . '/ApiTemplateRest.php';
-
-/*
-
-$wgAutoloadClasses['TemplateRestHooks'] = __DIR__ . '/TemplateRest.hooks.php';
-
-*/
-
-/*
-$wgResourceModules['ext.templaterest'] = array(
-	'scripts' => array()
-	'localBasePath' => __DIR__,
-	'remoteExtPath' => 'templaterest',
-);
-*/
+require_once __DIR__ . '/autoload.php';
