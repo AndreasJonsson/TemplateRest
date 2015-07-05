@@ -83,8 +83,9 @@ class DOMDocumentArticle implements Article
 			$e->setAttribute('typeof', 'mw:Transclusion');
 			$data = new \stdClass();
 			$obj = new \stdClass();
-			$obj->target = $target;
-			$obj->params = array();
+			$obj->template = new \stdClass();
+			$obj->template->target = $target;
+			$obj->template->params = array();
 			$data->parts = array( $obj );
 			$e->setAttribute('mw-data', \json_encode( $data ) );
 			$this->domDoc->getElementsByTagName( 'body' )->item(0)->appendChild( $e );
@@ -121,8 +122,8 @@ class DOMDocumentArticle implements Article
 
 			$i = 0;
 			foreach ( $data->parts as $part ) {
-				if (isset( $part->target )) {
-					$target = $this->getTarget($part->target);
+				if (isset( $part->template )) {
+					$target = $this->getTarget($part->template->target);
 					if ( !isset( $this->transclusions[$target] ) ) {
 						$this->transclusions[$target] = array();
 					}

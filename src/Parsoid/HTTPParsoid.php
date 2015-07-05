@@ -31,7 +31,7 @@ class HTTPParsoid implements Parsoid
 
         $factory = $this->requestFactory;
 
-        $request = $factory( $this->url . '/v2/' . $this->domain . '/' . $this->format . '/' . $pageName, array( 'method' => 'get',  'followRedirects' => true ) );
+        $request = call_user_func($factory,  $this->url . '/v2/' . $this->domain . '/' . $this->format . '/' . $pageName, array( 'method' => 'get',  'followRedirects' => true ) );
 
 		$responseContent = '';
 
@@ -43,7 +43,7 @@ class HTTPParsoid implements Parsoid
         $request->execute();
 
         if ( ! $request->status->isGood() ) {
-			throw new Exception('Failed to get the page content from parsoid: ' . $request->status);
+			throw new \Exception('Failed to get the page content from parsoid: ' . $request->status);
         }
 
 		return $responseContent;

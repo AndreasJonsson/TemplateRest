@@ -25,7 +25,7 @@ class TestDOMElementTransclusion extends \PHPUnit_Framework_TestCase
 
 		$data = \json_decode($transclusion->getAttribute('data-mw'));
 
-		$target = $data->parts[$partIndex]->target->wt;
+		$target = $data->parts[$partIndex]->template->target->wt;
 		
 		$t = new DOMElementTransclusion( $target, $transclusion, $index, $partIndex );
 

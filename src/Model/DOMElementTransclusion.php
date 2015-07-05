@@ -32,7 +32,7 @@ class DOMElementTransclusion implements Transclusion
 	public function getParameters()
 	{
 		$dataMw = \json_decode($this->domElement->getAttribute('data-mw'));
-		return $dataMw->parts[$this->partIndex]->params;
+		return $dataMw->parts[$this->partIndex]->template->params;
 	}
 
 	/**
@@ -44,7 +44,7 @@ class DOMElementTransclusion implements Transclusion
 	{
 		$dataMw = \json_decode($this->domElement->getAttribute('data-mw'));
 
-		$dataMw->parts[$this->partIndex]->params = $parameterData;
+		$dataMw->parts[$this->partIndex]->template->params = $parameterData;
 
 		$this->domElement->setAttribute('data-mw', \json_encode($dataMw) );
 	}
@@ -60,11 +60,11 @@ class DOMElementTransclusion implements Transclusion
 		$dataMw = \json_decode($this->domElement->getAttribute('data-mw'));
 
 		foreach ( get_object_vars( $parameterData ) as $paramName => $paramInfo ) {
-			$dataMw->parts[$this->partIndex]->params->{$paramName} = $paramInfo;
+			$dataMw->parts[$this->partIndex]->template->params->{$paramName} = $paramInfo;
 		}
 
 		foreach ($removeParameters as $remove) {
-			unset($dataMw->parts[$this->partIndex]->params->{$remove});
+			unset($dataMw->parts[$this->partIndex]->template->params->{$remove});
 		}
 
 		$this->domElement->setAttribute('data-mw', \json_encode($dataMw) );

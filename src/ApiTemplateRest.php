@@ -4,6 +4,7 @@ namespace TemplateRest;
 
 use TemplateRest\Parsoid\Parsoid;
 use TemplateRest\Parsoid\HTTPParsoid;
+use TemplateRest\Model\DOMDocumentArticle;
 
 class ApiTemplateRest extends \ApiBase
 {
