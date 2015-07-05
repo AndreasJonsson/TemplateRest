@@ -92,7 +92,7 @@ class DOMElementTransclusion implements Transclusion
 			$this->domElement->parentNode->removeChild( $this->domElement );
 			if ( !empty( $about ) ) {
 				$xpath = new \DOMXPath( $this->domElement->ownerDocument );
-				$nodeList = $xpath->query( '/body//*[@about="' . $about . '"]' );
+				$nodeList = $xpath->query( '//body//*[@about="' . $about . '"]' );
 				for ( $i = 0; $i < $nodeList->length; $i++ ) {
 					$node = $nodeList->item( $i );
 					$node->parentNode->removeChild( $node );

@@ -18,6 +18,16 @@ class TestDOMDocumentArticle extends \PHPUnit_Framework_TestCase
 		$this->assertEquals( array( 'foo' ), $article->getTransclusions() );
 	}
 
+	public function test2()
+	{
+		$article = new DOMDocumentArticle();
+
+		$article->setXhtml( \file_get_contents( __DIR__ . '/Test2.xml' ) );
+
+		$this->assertEquals( array( 'Mall:Bottles_of_beer_-_fulltext', 'Mall:Bottles_of_beer_-_table' ), $article->getTransclusions() );
+
+	}
+
 	public function testModify()
 	{
 		$article = new DOMDocumentArticle();

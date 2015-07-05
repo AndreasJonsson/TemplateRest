@@ -45,12 +45,12 @@ class ApiTemplateRest extends \ApiBase
 		}
 	}
 
-	public function getAllowedParameters() {
+	public function getAllowedParams() {
 		return array( 'title' =>
 			array(
-				ApiBase::PARAM_TYPE =>  'string',
-				ApiBase::PARAM_REQUIRED => true,
-				ApiBase::PARAM_ISMULTI => false
+				\ApiBase::PARAM_TYPE =>  'string',
+				\ApiBase::PARAM_REQUIRED => true,
+				\ApiBase::PARAM_ISMULTI => false
 			)
 		);
 	}
