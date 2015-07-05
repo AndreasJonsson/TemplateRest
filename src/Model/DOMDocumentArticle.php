@@ -24,7 +24,7 @@ class DOMDocumentArticle implements Article
 
 		$xpath = new \DOMXpath( $this->domDocument );
 
-		$transclusionElements = $xpath->query( '/body//span[@typeof="mw:Transclusion"]' );
+		$transclusionElements = $xpath->query( '/body//*[@typeof="mw:Transclusion"]' );
 
 		$this->transclusions = array();
 
