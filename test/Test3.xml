@@ -1,0 +1,16 @@
+<!DOCTYPE html>
+<html prefix="dc: http://purl.org/dc/terms/ mw: http://mediawiki.org/rdf/" about="http://testfarm.kreablo.se/pl/Special:Redirect/revision/638"><head prefix="mwr: http://testfarm.kreablo.se/pl/Special:Redirect/"><meta property="mw:articleNamespace" content="10"/><link rel="dc:replaces" resource="mwr:revision/0"/><meta property="dc:modified" content="2015-04-28T07:50:39.000Z"/><meta about="mwr:user/1" property="dc:title" content="Wiki Administrator"/><link rel="dc:contributor" resource="mwr:user/1"/><meta property="mw:revisionSHA1" content="55a9063b2a80dad960f5d260a86e06e390631a06"/><meta property="dc:description" content="Skapade sidan med '{{Bottles of beer|number of bottles=99}}  {{Bottles of beer|number of bottles=98}}  {{Bottles of beer|number of bottles=97}}  . . .  {{Bottles of beer|number of bottles=1}}'"/><meta property="mw:parsoidVersion" content="0"/><link rel="dc:isVersionOf" href="http://testfarm.kreablo.se/pl/Mall%3ABottles_of_beer_-_fulltext"/><title>Mall:Bottles_of_beer_-_fulltext</title><base href="http://testfarm.kreablo.se/pl/"/><link rel="stylesheet" href="//localhost/s_pl/load.php?modules=mediawiki.legacy.commonPrint,shared|mediawiki.skinning.elements|mediawiki.skinning.content|mediawiki.skinning.interface|skins.vector.styles|site|mediawiki.skinning.content.parsoid|ext.cite.style&amp;only=styles&amp;skin=vector"/></head><body data-parsoid='{"dsr":[0,172,0,0]}' lang="sv" class="mw-content-ltr sitedir-ltr ltr mw-body mw-body-content mediawiki" dir="ltr"><p about="#mwt1" typeof="mw:Transclusion" data-parsoid='{"dsr":[0,40,0,0],"pi":[[{"k":"number of bottles","named":true,"spc":["","","",""]}]]}' data-mw='{"parts":[{"template":{"target":{"wt":"Bottles of beer","href":"./Mall:Bottles_of_beer"},"params":{"number of bottles":{"wt":"99"}},"i":0}}]}'>99 bottles of beer on the wall, 99 bottles of beer.
+Take one down and pass it around, bottles of beer on the wall.</p>
+
+<p about="#mwt2" typeof="mw:Transclusion" data-parsoid='{"dsr":[42,82,0,0],"pi":[[{"k":"number of bottles","named":true,"spc":["","","",""]}]]}' data-mw='{"parts":[{"template":{"target":{"wt":"Bottles of beer","href":"./Mall:Bottles_of_beer"},"params":{"number of bottles":{"wt":"98"}},"i":0}}]}'>98 bottles of beer on the wall, 98 bottles of beer.
+Take one down and pass it around, bottles of beer on the wall.</p>
+
+<p about="#mwt3" typeof="mw:Transclusion" data-parsoid='{"dsr":[84,124,0,0],"pi":[[{"k":"number of bottles","named":true,"spc":["","","",""]}]]}' data-mw='{"parts":[{"template":{"target":{"wt":"Bottles of beer","href":"./Mall:Bottles_of_beer"},"params":{"number of bottles":{"wt":"97"}},"i":0}}]}'>97 bottles of beer on the wall, 97 bottles of beer.
+Take one down and pass it around, bottles of beer on the wall.</p>
+
+<p data-parsoid='{"dsr":[126,131,0,0]}'>.
+.
+.</p>
+
+<p about="#mwt4" typeof="mw:Transclusion" data-parsoid='{"dsr":[133,172,0,0],"pi":[[{"k":"number of bottles","named":true,"spc":["","","",""]}]]}' data-mw='{"parts":[{"template":{"target":{"wt":"Bottles of beer","href":"./Mall:Bottles_of_beer"},"params":{"number of bottles":{"wt":"1"}},"i":0}}]}'>1 bottle of beer on the wall, 1 bottle of beer.
+Take one down and pass it around, bottles of beer on the wall.</p></body></html>

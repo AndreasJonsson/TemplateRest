@@ -10,9 +10,10 @@ interface Parsoid
 
 	/**
 	 * @param string $pageName.
+	 * @param int $revision.
 	 * @return string the rendered xhtml of the page.
 	 */
-	function getPageXhtml( $pageName );
+	function getPageXhtml( $pageName, $revision = null );
 
 
 	/**

@@ -24,14 +24,17 @@ class HTTPParsoid implements Parsoid
 
 	/**
 	 * @param string $pageName.
+	 * @param int $revision.
 	 * @return string the rendered xhtml of the page.
 	 */
-	public function getPageXhtml( $pageName )
+	public function getPageXhtml( $pageName, $revision = null )
 	{
 
         $factory = $this->requestFactory;
 
-        $request = call_user_func($factory,  $this->url . '/v2/' . $this->domain . '/' . $this->format . '/' . $pageName, array( 'method' => 'get',  'followRedirects' => true ) );
+		$rev = $revision == null ? '' : '/' . $revision ;
+
+        $request = call_user_func($factory,  $this->url . '/v2/' . $this->domain . '/' . $this->format . '/' . $pageName . $rev, array( 'method' => 'get',  'followRedirects' => true ) );
 
 		$responseContent = '';
 
@@ -60,7 +63,7 @@ class HTTPParsoid implements Parsoid
 
         $factory = $this->requestFactory;
 
-        $request = $factory( $this->url . '/v2/' . $this->domain . '/wt/' . $pageName, array( 'method' => 'post',  'followRedirects' => true ) );
+        $request = call_user_func($factory, $this->url . '/v2/' . $this->domain . '/wt/' . $pageName, array( 'method' => 'post',  'followRedirects' => true ) );
 
         $request->setData(
            wfArrayToCgi(
@@ -78,7 +81,13 @@ class HTTPParsoid implements Parsoid
 
         $request->execute();
 
-		return $resposeContent;
+		$wt = \json_decode( $responseContent, true );
+
+		if ( !(isset($wt['wikitext']) && isset($wt['wikitext']['body'])) ) {
+			throw new \MWException('Did not get wikitext on expected format.');
+		}
+
+		return $wt['wikitext']['body'];
 	}
 
 

@@ -2,7 +2,7 @@
       mwns10: http://en.wikipedia.org/wiki/Template%58">
   
 <span typeof="mw:Transclusion" about="#mwt1"
-  data-mw='{"parts": [{"template":{"target":{"wt":"foo"},"params":{"1":{"wt":"unused value"},"paramname":{"wt":"used value"}},"id":0}}]}'>
+  data-mw='{"parts": [{"template":{"target":{"wt":"foo"},"params":{"1":{"wt":"unused value"},"paramname":{"wt":"used value"}},"i":0}}]}'>
   Some text content
 </span>
 <table about="#mwt1">

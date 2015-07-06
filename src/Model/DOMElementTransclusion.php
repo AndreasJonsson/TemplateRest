@@ -12,17 +12,17 @@ class DOMElementTransclusion implements Transclusion
 
 	private $domElement;
 
-	private $index;
+	private $id;
 
 	private $partIndex;
 
 	private $dirty = false;
 
-	function __construct( $target, \DOMElement &$domElement, $index, $partIndex )
+	function __construct( $target, \DOMElement &$domElement, $id, $partIndex )
 	{
 		$this->target = $target;
 		$this->domElement = $domElement;
-		$this->index = $index;
+		$this->id = $id;
 		$this->partIndex = $partIndex;
 	}
 
@@ -31,8 +31,8 @@ class DOMElementTransclusion implements Transclusion
 	 */
 	public function getParameters()
 	{
-		$dataMw = \json_decode($this->domElement->getAttribute('data-mw'));
-		return $dataMw->parts[$this->partIndex]->template->params;
+		$dataMw = \json_decode($this->domElement->getAttribute('data-mw'), true);
+		return $dataMw['parts'][$this->partIndex]['template']['params'];
 	}
 
 	/**
@@ -42,9 +42,9 @@ class DOMElementTransclusion implements Transclusion
 	 */
 	public function setParameters( $parameterData )
 	{
-		$dataMw = \json_decode($this->domElement->getAttribute('data-mw'));
+		$dataMw = \json_decode($this->domElement->getAttribute('data-mw'), true);
 
-		$dataMw->parts[$this->partIndex]->template->params = $parameterData;
+		$dataMw['parts'][$this->partIndex]['template']['params'] = $parameterData;
 
 		$this->domElement->setAttribute('data-mw', \json_encode($dataMw) );
 	}
@@ -76,6 +76,14 @@ class DOMElementTransclusion implements Transclusion
 	public function getTarget()
 	{
 		return $this->target;
+	}
+
+	/**
+	 * @return int The id of this particular instance of the target template on the particular page.
+	 */
+	public function getId()
+	{
+		return $this->id;
 	}
 
 	/**

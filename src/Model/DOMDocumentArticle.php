@@ -12,12 +12,16 @@ class DOMDocumentArticle implements Article
 
 	private $transclusions;
 
+	private $revision;
+
 	/**
 	 * Set the xhtml contents of the article.
 	 * @param string $xhtml The xml content obtained from the parsoid server.
+	 * @param int $revision The article revision.
 	 */
-	public function setXhtml( $xhtml )
+	public function setXhtml( $xhtml, $revision = null )
 	{
+		$this->revision = $revision;
 		$this->domDocument = new \DOMDocument();
 		$this->domDocument->preserveWhiteSpace = true;
 		$this->domDocument->loadXML( $xhtml );
@@ -38,7 +42,7 @@ class DOMDocumentArticle implements Article
 	 */
 	public function getXhtml( )
 	{
-		return $this->domDocument->saveXML();
+		return $this->domDocument->saveXML( $this->domDocument->getElementsByTagName( 'body' )->item( 0 ) );
 	}
 
 	/**
@@ -46,7 +50,7 @@ class DOMDocumentArticle implements Article
 	 */
 	public function getTransclusions()
 	{
-		return array_keys($this->transclusions);
+		return array_keys( $this->transclusions );
 	}
 
 	/**
@@ -56,60 +60,88 @@ class DOMDocumentArticle implements Article
 	 */
 	public function getNumberOfTransclusions( $target )
 	{
-		if (isset($this->transclusions[$target])) {
+		if ( isset($this->transclusions[$target]) ) {
 			return count($this->transclusions[$target]);
 		} else {
 			return 0;
 		}
 	}
 
-	/**
-	 * @param string $target
-	 * @param int $index
-	 *
-	 * @return reference to Transclusion model of a particular transclusion.  To obtain a reference to a new transclusion, call getTranclusion( 'Template', getNumberofTransclusion( 'Template ' )).
-	 *
-	 * @throws Exception if $index > getNumberOfTransclusions( $target ) for the given templateTitle.
-	 */
-	public function &getTransclusion( $target, $index )
-	{
-		$n = $this->getNumberOfTransclusions( $target );
-		if ( $n < $index ) {
-			throw new Exception('No transclusion of ' . $target . ' indexed ' . $index . ' in this article.');
-		}
 
-		if ( $n == $index ) {
-			$e = $this->domDocument->createElement('span');
-			$e->setAttribute('typeof', 'mw:Transclusion');
-			$data = new \stdClass();
-			$obj = new \stdClass();
-			$obj->template = new \stdClass();
-			$obj->template->target = $target;
-			$obj->template->params = array();
-			$data->parts = array( $obj );
-			$e->setAttribute('mw-data', \json_encode( $data ) );
-			$this->domDoc->getElementsByTagName( 'body' )->item(0)->appendChild( $e );
-			$this->transclusions[$target][] = new DOMElementTransclusion( $target, $e, $index, 0 );
+	public function getTransclusionIds( $target ) {
+		$ids = array();
+		if ( isset( $this->transclusions[$target] ) ) {
+			foreach( $this->transclusions[$target] as $t ) {
+				$ids[] = $t->getId();
+			}
 		}
-
-		return $this->transclusions[$target][$index];
+		return $ids;
 	}
 
 	/**
-	 * Remove the occurence of the target template tranclusion corresponding to $index.
-	 * 
 	 * @param string $target
-	 * @param int $index
+	 * @param int $id
+	 *
+	 * @return reference to Transclusion model of a particular transclusion.  To obtain a reference to a new transclusion, call getTranclusion( 'Template', getNumberofTransclusion( 'Template ' )).
+	 *
 	 */
-	public function removeTransclusion( $target, $index )
+	public function &getTransclusion( $target, $id )
 	{
-		$n = $this->getNumberOfTransclusions( $target );
-		if ( $n <= $index ) {
-			throw new Exception( 'No transclusion of ' . $target . ' with index ' . $index . ' in this article.');
+
+		if ( !isset( $this->transclusions[$target] ) ) {
+			$this->transclusions[$target] = array();
 		}
 
-		$this->transclusions[$target][$index]->remove();
-		array_splice( $this->transclusions[$target], $index, 1 );
+		if ( !isset( $this->transclusions[$target][$id] ) ) {
+			$e = $this->domDocument->createElement('p');
+			$e->setAttribute('typeof', 'mw:Transclusion');
+			$e->setAttribute('about', '#mwt' . $this->getTemplateNumber());
+			$data = array(
+				'parts' => array(
+					array(
+						'template' => array(
+							'target' => array(
+								'wt'   => $target,
+								'href' => './' . $target
+							),
+							'params' => array(),
+							'i' => 0
+						)
+					)
+				)
+			);
+
+			$e->setAttribute('data-mw', \json_encode( $data ) );
+			$body = $this->domDocument->getElementsByTagName( 'body' )->item(0);
+			$body->appendChild( $this->domDocument->createTextNode( "\n\n" ) );
+			$body->appendChild( $e );
+			$body->appendChild( $this->domDocument->createTextNode( "\n\n" ) );
+			$this->transclusions[$target][$id] = new DOMElementTransclusion( $target, $e, $id, 0 );
+		}
+
+		return $this->transclusions[$target][$id];
+	}
+
+	/**
+	 * Remove the occurence of the target template tranclusion corresponding to $id.
+	 * 
+	 * @param string $target
+	 * @param int $id
+	 */
+	public function removeTransclusion( $target, $id )
+	{
+		$n = $this->getNumberOfTransclusions( $target );
+		if ( !(isset( $this->transclusions[$target]) && isset( $this->transclusions[$target][$id] )) ) {
+			throw new Exception( 'No transclusion of ' . $target . ' with id ' . $id . ' in this article.');
+		}
+
+		$this->transclusions[$target][$id]->remove();
+		array_splice( $this->transclusions[$target], $id, 1 );
+	}
+
+	public function getRevision()
+	{
+		return $this->revision;
 	}
 
 
@@ -118,19 +150,20 @@ class DOMDocumentArticle implements Article
 		$dataMw = $transclusionElement->getAttribute('data-mw');
 
 		if ( $dataMw !== null ) {
-			$data = \json_decode( $dataMw );
+			$data = \json_decode( $dataMw, true );
 
 			$i = 0;
-			foreach ( $data->parts as $part ) {
-				if (isset( $part->template )) {
-					$target = $this->getTarget($part->template->target);
+			foreach ( $data['parts'] as $part ) {
+				if (isset( $part['template'] )) {
+					$target = $this->getTarget($part['template']['target']);
 					if ( !isset( $this->transclusions[$target] ) ) {
 						$this->transclusions[$target] = array();
 					}
+					$id = count( $this->transclusions[$target] );
 					$this->transclusions[$target][] = new DOMElementTransclusion(
 						$target,
 						$transclusionElement,
-						count($this->transclusions[$target]),
+						$id,
 						$i
 					);
 				}
@@ -140,10 +173,19 @@ class DOMDocumentArticle implements Article
 	}
 
 	private function getTarget( $targetObj ) {
-		if (isset( $targetObj->href ) ) {
-			return substr($targetObj->href, 2);
+		if (isset( $targetObj['href'] ) ) {
+			$target = substr($targetObj['href'], 2);
+		} else {
+			$target = $targetObj['wt'];
 		}
-		return $targetObj->wt;
+		return \Title::newFromText( $target, NS_TEMPLATE )->getText();
 	}
 
+	private function getTemplateNumber() {
+		$n = 1;
+		foreach ($this->transclusions as $target => $transclusions) {
+			$n += count($transclusions);
+		}
+		return $n;
+	}
 }

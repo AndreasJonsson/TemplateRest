@@ -9,7 +9,7 @@ interface Article
 	 * Set the xhtml contents of the article.
 	 * @param string $xhtml The xml content obtained from the parsoid server.
 	 */
-	function setXhtml( $xhtml );
+	function setXhtml( $xhtml, $revision = null );
 
 	/**
 	 * @return the xml contents of the article, suitable for passing to the parsoid server.
@@ -30,20 +30,32 @@ interface Article
 
 	/**
 	 * @param string $target
-	 * @param int $index
+	 *
+	 * @return array Existing ids of transclusions of this target template.
+	 */
+	function getTransclusionIds( $target );
+
+	/**
+	 * @param string $target
+	 * @param int $id
 	 *
 	 * @return reference to Transclusion model of a particular transclusion.  To obtain a reference to a new transclusion, call getTranclusion( 'Template', getNumberofTransclusion( 'Template ' )).
 	 *
 	 * @throws Exception if $index > getNumberOfTransclusions( $templateTitle ) for the given templateTitle.
 	 */
-	function &getTransclusion( $target, $index );
+	function &getTransclusion( $target, $id );
 
 	/**
 	 * Remove the occurence of the target template tranclusion corresponding to $index.
 	 * 
 	 * @param string $target
-	 * @param int $index
+	 * @param int $id
 	 */
-	function removeTransclusion( $target, $index );
+	function removeTransclusion( $target, $id );
+
+	/**
+	 * @return int The revision of the article.
+	 */
+	function getRevision();
 
 }
