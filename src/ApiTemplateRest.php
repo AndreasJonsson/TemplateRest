@@ -114,7 +114,7 @@ class ApiTemplateRest extends \ApiBase
 		$this->addModelToResult( $model );
 	}
 
-	private function doPut( $title, $data ) {
+	private function doSomething( $title, $data, $saveMessage, $what ) {
 		
 		$model = $this->getModelCheckEditPossible( $title, $data );
 
@@ -122,14 +122,34 @@ class ApiTemplateRest extends \ApiBase
 
 		foreach ( $data['transclusions'] as $target => $instances ) {
 			if ( !is_array( $instances ) ) {
-				$this->dieUsageMsg( 'templaterest-transclusions-parameter-must-be-array' );
+				$this->dieUsage( 'Transclusion parameter must be a map.', 'transclusions-parameter-must-be-array' );
 			}
 			foreach ( $instances as $parameters ) {
+
+				if (isset($parameters['index'])) {
+					$index = $parameters['index'];
+				} else {
+					$index = null;
+				}
+
+				call_user_func_array( $what, array($model, $target, $index, $parameters, &$updatedTransclusions) );
+			}
+		}
+
+		if ( count( $updatedTransclusions ) > 0 ) {
+			$this->save( $title, $model, $data, $saveMessage, $updatedTransclusions );
+		}
+
+		$this->addModelToResult( $model );
+
+	}
+
+	private function doPut( $title, $data ) {
+
+		$this->doSomething( $title, $data, 'templaterest-put-templates', function( $model, $target, $index, $parameters, &$updatedTransclusions ) {
 				$updated = false;
 
-				list( $target, $parameters ) = $this->validateTransclusion( $target, $parameters );
-
-				$index = $parameters['index'];
+				$this->validateTransclusion( $target, $parameters );
 
 				if ( $model->getNumberOfTransclusions( $target ) == $index ) {
 					$updated = true;
@@ -141,12 +161,55 @@ class ApiTemplateRest extends \ApiBase
 					$updatedTransclusions[] = $target . '-' . $index;
 					$transclusion->setParameters( $parameters['params'] );
 				}
-			}
-		}
 
-		$this->save( $title, $model, $data, $updatedTransclusions );
+			});
+	}
 
-		$this->addModelToResult( $model );
+	private function doDelete( $title, $data ) {
+
+		$this->doSomething( $title, $data, 'templaterest-delete-templates', function( $model, $target, $index, $parameters, &$updatedTransclusions ) {
+
+				if ( $index === null || ! \is_int( $index ) ) {
+					$this->dieUsageMessage( 'templaterest-index-parameter-missing-or-invalid' );
+				}
+
+				if ( $model->removeTransclusion( $target, $index ) ) {
+					$updatedTransclusions[] = $target . '-' . $index;
+				}
+
+			});
+
+	}
+
+	private function doPatch( $title, $data ) {
+
+		$this->doSomething( $title, $data, 'templaterest-patch-templates', function( $model, $target, $index, $parameters, &$updatedTransclusions ) {
+				$updated = false;
+
+				$this->validateTransclusion( $target, $parameters );
+
+				if ( $model->getNumberOfTransclusions( $target ) == $index ) {
+					$updated = true;
+				}
+
+				$transclusion = $model->getTransclusion( $target, $index );
+
+				$oldParameters = $transclusion->getParameters();
+
+				foreach ( $parameters['params'] as $key => $value ) {
+					if ( !isset( $oldParameters[$key] ) || $oldParameters[$key] !== $value ) {
+						$updated = true;
+						$oldParameters[$key] = $value;
+					}
+				}
+
+				if ( $updated ) {
+					$updatedTransclusions[] = $target . '-' . $index;
+					$transclusion->setParameters( $oldParameters );
+				}
+
+			});
+
 	}
 
 	private function getModelCheckEditPossible( $title, $data ) {
@@ -156,12 +219,12 @@ class ApiTemplateRest extends \ApiBase
 		$wikiPage = \WikiPage::factory( \Title::newFromText( $title ) );
 		$revision = $wikiPage->getRevision()->getId();
 		if ( $data['revision'] !== $revision && ! (isset( $data['force'] ) && $data['force']) ) {
-			$this->dieUsageMsg( 'templaterest-revision-mismatch' );
+			$this->dieUsage( "Revision mismatch.", 'revision-mismatch' );
 		}
 		return $this->getModel( $title, $revision );
 	}
 
-	private function save( $pageName, $model, $data, $updatedTransclusions ) {
+	private function save( $pageName, $model, $data, $saveMessage, $updatedTransclusions ) {
 
 		$title = \Title::newFromText( $pageName );
 
@@ -171,7 +234,7 @@ class ApiTemplateRest extends \ApiBase
 		if (isset($data['summary']) ) {
 			$summary = $data['summary'];
 		} else {
-			$summary = $this->msg( 'templaterest-edit-summary', implode(', ', $updatedTransclusions) );
+			$summary = $this->msg( $saveMessage, implode(', ', $updatedTransclusions) );
 		}
 
 		$content = \ContentHandler::makeContent( $wt, $title );
@@ -180,7 +243,7 @@ class ApiTemplateRest extends \ApiBase
 
 		if ( ! $status->isOK() ) {
 			$this->getResult()->addValue( null, 'error', $status->getHTML() );
-			$this->dieUsageMsg( 'templaterest-save-failed' );
+			$this->dieUsage( "Failed to save modified article.", 'save-failed' );
 		}
 	}
 
@@ -189,18 +252,18 @@ class ApiTemplateRest extends \ApiBase
 
 		if ( isset($parameters['index']) ) {
 			if (!is_int( $parameters['index'] ) && $parameters['index'] >= 0 ) {
-				$this->dieUsageMsg( 'templaterest-invalid-index' );
+				$this->dieUsage( "Invalid index.", 'invalid-index' );
 			}
 		} else {
 			$parameters['index'] = 0;
 		}
 
 		if ( !isset($parameters['params']) ) {
-			$this->dieUsageMsg( 'templaterest-transclusion-params-not-set' );
+			$this->dieUsage( "The transclusion parameters are not set on transclusion $target.", 'transclusion-params-not-set' );
 		}
 
 		if ( !is_array($parameters['params']) ) {
-			$this->dieUsageMsg( 'templaterest-invalid-parameters-not-array' );
+			$this->dieUsage( "The transclusion parameters must be a map.", 'invalid-parameters-not-array' );
 		}
 
 		if ( count($parameters) > 2 ) {
@@ -214,12 +277,12 @@ class ApiTemplateRest extends \ApiBase
 						$unknown[] = $param;
 				}
 			}
-			$this->dieUsageMsg( 'templaterest-unknown-parameters' . implode( ', ', $unknown ) );
+			$this->dieUsageMsg( 'Unknown parameters in transclusion data: ' . implode( ', ', $unknown ), 'unknown-parameters' );
 		}
 
 		foreach ( $parameters['params'] as $key => $value ) {
 			if ( !isset( $value['wt'] ) ) {
-				$this->dieUsageMsg( 'templaterest-parameter-value-not-set', $key );
+				$this->dieUsage( "The parameter value is not set on parameter $key of transclusion $target-{$parameters['index']}.", 'parameter-value-not-set');
 			}
 		}
 
@@ -244,4 +307,5 @@ class ApiTemplateRest extends \ApiBase
 
 		return false;
 	}
+
 }

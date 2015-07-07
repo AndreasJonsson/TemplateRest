@@ -50,6 +50,8 @@ interface Article
 	 * 
 	 * @param string $target
 	 * @param int $id
+	 * 
+	 * @return boolean true If a template was removed.  False if the template did not exist.
 	 */
 	function removeTransclusion( $target, $id );
 

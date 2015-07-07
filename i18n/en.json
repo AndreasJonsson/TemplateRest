@@ -8,11 +8,7 @@
         "templaterest-desc": "Restful service for editing template transclusions.",
         "apihelp-templaterest-description": "Restful service for editing template transclusions.",
         "apihelp-templaterest-param-title": "Title of page to edit.",
-        "templaterest-revision-mismatch": "Revision mismatch.",
-        "templaterest-save-failed": "Save failed.",
-        "templaterest-invalid-index": "Invalid index.",
-        "templaterest-transclusion-params-not-set": "Transclusion parameters is not set.",
-        "templaterest-invalid-parameters-not-array": "Transclusion parameters must be an array.",
-        "templaterest-unknown-parameters": "Unknown paramters in transclusion: $1",
-        "templaterest-parameter-value-not-set": "Transclusion parameter value as wikitext is not set."
+        "templaterest-put-templates": "Templaterest PUT transclusions.  The following template transclusions where updated or added: $1.",
+        "templaterest-delete-templates": "Templaterest DELETE transclusions.  The following template transclusions where deleted: $1.",
+        "templaterest-patch-templates": "Templaterest PATCH transclusions.  The following template transclusions where updated or added: $1."
 }

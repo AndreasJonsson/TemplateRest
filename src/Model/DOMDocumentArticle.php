@@ -127,16 +127,20 @@ class DOMDocumentArticle implements Article
 	 * 
 	 * @param string $target
 	 * @param int $id
+	 * 
+	 * @return boolean true If a template was removed.  False if the template did not exist.
 	 */
 	public function removeTransclusion( $target, $id )
 	{
 		$n = $this->getNumberOfTransclusions( $target );
 		if ( !(isset( $this->transclusions[$target]) && isset( $this->transclusions[$target][$id] )) ) {
-			throw new Exception( 'No transclusion of ' . $target . ' with id ' . $id . ' in this article.');
+			return false;
 		}
 
 		$this->transclusions[$target][$id]->remove();
 		array_splice( $this->transclusions[$target], $id, 1 );
+
+		return true;
 	}
 
 	public function getRevision()
