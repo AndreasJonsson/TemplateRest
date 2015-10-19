@@ -49,11 +49,12 @@ class HTTPParsoid implements Parsoid
 	 * @param string $url
 	 * @param string $domain
 	 */
-	public function __construct( $requestFactory,  $url, $domain )
+	public function __construct( $requestFactory,  $url, $domain, $prefix )
 	{
 		$this->requestFactory = $requestFactory;
 		$this->url = $url;
 		$this->domain = $domain;
+		$this->prefix = $prefix;
 	}
 
 	/**
@@ -66,9 +67,11 @@ class HTTPParsoid implements Parsoid
 
         $factory = $this->requestFactory;
 
-		$rev = $revision == null ? '' : '/' . $revision ;
+		$rev = $revision == null ? '' : '?oldid=' . $revision ;
 
-        $request = call_user_func($factory,  $this->url . '/v2/' . $this->domain . '/html/' . urlencode($pageName) . $rev, array( 'method' => 'get',  'followRedirects' => true ) );
+		$url = $this->url . '/' . $this->prefix . '/'  . $this->pageName($pageName) . $rev;
+
+        $request = call_user_func($factory,  $url, array( 'method' => 'get',  'followRedirects' => true ));
 
 		$responseContent = '';
 
@@ -80,7 +83,7 @@ class HTTPParsoid implements Parsoid
         $request->execute();
 
         if ( ! $request->status->isGood() ) {
-			throw new \Exception('Failed to get the page content from parsoid: ' . $request->status . ' parsoid url: ' . $this->url . '/v2/' . $this->domain . '/html/' . $pageName . $rev);
+			throw new \Exception('Failed to get the page content from parsoid: ' . $url);
         }
 
 		return $responseContent;
@@ -97,7 +100,9 @@ class HTTPParsoid implements Parsoid
 
         $factory = $this->requestFactory;
 
-        $request = call_user_func($factory, $this->url . '/v2/' . $this->domain . '/wt/' . urlencode($pageName), array( 'method' => 'post',  'followRedirects' => true ) );
+		$url = $this->url . '/' . $this->prefix . '/'  . $this->pageName($pageName);
+
+        $request = call_user_func($factory, $url, array( 'method' => 'post',  'followRedirects' => true ) );
 
         $request->setData(
 			\wfArrayToCgi(
@@ -122,6 +127,11 @@ class HTTPParsoid implements Parsoid
 		}
 
 		return $wt['wikitext']['body'];
+	}
+
+	private function pageName( $pageName ) {
+		$title = Title::newFromText( $pageName );
+		return urlencode( $title->getPrefixedDbKey() );
 	}
 
 }

@@ -111,7 +111,13 @@ class ApiTemplateRest extends \ApiBase
 			$this->dieUsage( 'Wiki domain for parsoid not configured!', 'templaterest-parsoid-domain', 500 );
 		}
 
-		$this->parsoid = new HTTPParsoid( '\MWHttpRequest::factory', $url, $domain );
+		if ( isset($wgVisualEditorParsoidPrefix) ) {
+			$prefix = $wgVisualEditorParsoidPrefix;
+		} else {
+			$this->dieUsage( 'Wiki prefix for parsoid not configured!', 'templaterest-parsoid-prefix', 500 );
+		}
+
+		$this->parsoid = new HTTPParsoid( '\MWHttpRequest::factory', $url, $domain, $prefix );
 	}
 
 	private function getModel( $title, $revision = null ) {
