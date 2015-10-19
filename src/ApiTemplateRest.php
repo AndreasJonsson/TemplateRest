@@ -71,7 +71,7 @@ class ApiTemplateRest extends \ApiBase
 		}  catch (\UsageException $e) {
 			throw $e;
 		} catch (\Exception $e) {
-			$this->dieUsage( 'Caught exception: $e', 'templaterest-caught-exception', 500 );
+			$this->dieUsage( "Caught exception: $e", 'templaterest-caught-exception', 500 );
 		}
 	}
 
