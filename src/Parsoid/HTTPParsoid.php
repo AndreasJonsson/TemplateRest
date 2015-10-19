@@ -120,6 +120,7 @@ class HTTPParsoid implements Parsoid
 
         $request->execute();
 
+		/*
 		$wt = \json_decode( $responseContent, true );
 
 		if ( !(isset($wt['wikitext']) && isset($wt['wikitext']['body'])) ) {
@@ -127,6 +128,8 @@ class HTTPParsoid implements Parsoid
 		}
 
 		return $wt['wikitext']['body'];
+		*/
+		return $responseContent;
 	}
 
 	private function pageName( $pageName ) {
