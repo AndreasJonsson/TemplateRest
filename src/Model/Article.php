@@ -81,4 +81,8 @@ interface Article
 	 */
 	function getRevision();
 
+	/**
+	 * @param int Set the revision of the article.
+	 */
+	function setRevision( $revision );
 }

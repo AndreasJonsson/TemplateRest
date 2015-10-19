@@ -49,7 +49,7 @@ class DOMDocumentArticle implements Article
 
 		$xpath = new \DOMXpath( $this->domDocument );
 
-		$transclusionElements = $xpath->query( '//body//*[@typeof="mw:Transclusion"]' );
+		$transclusionElements = $xpath->query( '//body//*[contains(concat(" ", normalize-space(@typeof), " "), " mw:Transclusion ")]' );
 
 		$this->transclusions = array();
 
@@ -169,6 +169,10 @@ class DOMDocumentArticle implements Article
 		return $this->revision;
 	}
 
+	public function setRevision( $revision )
+	{
+		$this->revision = $revision;
+	}
 
 	private function addtransclusionElement( $transclusionElement )
 	{

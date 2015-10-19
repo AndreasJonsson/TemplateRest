@@ -68,7 +68,7 @@ class HTTPParsoid implements Parsoid
 
 		$rev = $revision == null ? '' : '/' . $revision ;
 
-        $request = call_user_func($factory,  $this->url . '/v2/' . $this->domain . '/html/' . $pageName . $rev, array( 'method' => 'get',  'followRedirects' => true ) );
+        $request = call_user_func($factory,  $this->url . '/v2/' . $this->domain . '/html/' . urlencode($pageName) . $rev, array( 'method' => 'get',  'followRedirects' => true ) );
 
 		$responseContent = '';
 
@@ -80,7 +80,7 @@ class HTTPParsoid implements Parsoid
         $request->execute();
 
         if ( ! $request->status->isGood() ) {
-			throw new \Exception('Failed to get the page content from parsoid: ' . $request->status);
+			throw new \Exception('Failed to get the page content from parsoid: ' . $request->status . ' parsoid url: ' . $this->url . '/v2/' . $this->domain . '/html/' . $pageName . $rev);
         }
 
 		return $responseContent;
@@ -97,7 +97,7 @@ class HTTPParsoid implements Parsoid
 
         $factory = $this->requestFactory;
 
-        $request = call_user_func($factory, $this->url . '/v2/' . $this->domain . '/wt/' . $pageName, array( 'method' => 'post',  'followRedirects' => true ) );
+        $request = call_user_func($factory, $this->url . '/v2/' . $this->domain . '/wt/' . urlencode($pageName), array( 'method' => 'post',  'followRedirects' => true ) );
 
         $request->setData(
 			\wfArrayToCgi(

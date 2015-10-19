@@ -63,8 +63,16 @@ class TestDOMDocumentArticle extends \PHPUnit_Framework_TestCase
 
 		$t = $a2->getTransclusion( 'foo', 0 );
 
-		$this->assertEquals( array_keys(get_object_vars($t->getParameters())), array( 'paramname', 'param1' ) );
+		$this->assertEquals( array_keys($t->getParameters()), array( 'paramname', 'param1' ) );
 	}
 
+	public function test4()
+	{
+		$article = new DOMDocumentArticle();
+
+		$article->setXhtml( \file_get_contents( __DIR__ . '/Test4.xml' ));
+
+		$this->assertEquals( array( 'Mall:Dropfilelist' ), $article->getTransclusions() );
+	}
 }
 

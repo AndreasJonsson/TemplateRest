@@ -38,7 +38,7 @@ class TestDOMElementTransclusion extends \PHPUnit_Framework_TestCase
 
 		$params = $t->getParameters();
 
-		$this->assertEquals( array_keys(get_object_vars($params)), array( '0' => '1', '1' => 'paramname' ) );
+		$this->assertEquals( array_keys($params), array( '0' => '1', '1' => 'paramname' ) );
 
 		$updatedParams = new \stdClass();
 
@@ -49,7 +49,7 @@ class TestDOMElementTransclusion extends \PHPUnit_Framework_TestCase
 
 		list($t2, $domDoc2) = $this->getTransclusion( $domDoc->saveXML(), 0, 0, false );
 
-		$this->assertEquals( array_keys(get_object_vars($t2->getParameters())), array( '0' => 'param1') );
+		$this->assertEquals( array_keys($t2->getParameters()), array( '0' => 'param1') );
 	}
 
 	public function testTarget()
@@ -72,7 +72,7 @@ class TestDOMElementTransclusion extends \PHPUnit_Framework_TestCase
 
 		list($t2, $domDoc2) = $this->getTransclusion( $domDoc->saveXML(), 0, 0, false );
 
-		$this->assertEquals( array_keys(get_object_vars($t2->getParameters())), array( '0' => '1', '1' => 'paramname', '2' => 'param1' ) );
+		$this->assertEquals( array_keys($t2->getParameters()), array( '0' => '1', '1' => 'paramname', '2' => 'param1' ) );
 		
 	}
 
@@ -86,7 +86,7 @@ class TestDOMElementTransclusion extends \PHPUnit_Framework_TestCase
 
 		list($t2, $domDoc2) = $this->getTransclusion( $domDoc->saveXML(), 0, 0, false );
 
-		$this->assertEquals( array_keys(get_object_vars($t2->getParameters())), array( '0' => '1' ) );
+		$this->assertEquals( array_keys($t2->getParameters()), array( '0' => '1' ) );
 	}
 
 	public function testRemove()

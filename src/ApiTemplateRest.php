@@ -38,7 +38,7 @@ class ApiTemplateRest extends \ApiBase
 	public function execute() {
 
 		if ( ! $this->getUser()->isAllowed( 'read' ) ) {
-			$this->dieUsageMsg( 'badaccess-groups' );
+			$this->dieUsage( "Permission denied!", 'badaccess-groups', 403 );
 		}
 
 		$this->init();
@@ -50,22 +50,28 @@ class ApiTemplateRest extends \ApiBase
 
 		$data = \json_decode( $contents, true );
 
-		switch ( strtoupper($_SERVER['REQUEST_METHOD']) ) {
-			case 'GET':
-				$this->doGet( $title, $data, $flat );
-				break;
-			case 'PUT':
-				$this->doPut( $title, $data, $flat );
-				break;
-			case 'PATCH':
-				$this->doPatch( $title, $data, $flat );
-				break;
-			case 'DELETE':
-				$this->doDelete( $title, $data, $flat );
-				break;
-			default:
-				$this->dieUsage( 'Unsupported method' );
-				break;
+		try {
+			switch ( strtoupper($_SERVER['REQUEST_METHOD']) ) {
+				case 'GET':
+					$this->doGet( $title, $data, $flat );
+					break;
+				case 'PUT':
+					$this->doPut( $title, $data, $flat );
+					break;
+				case 'PATCH':
+					$this->doPatch( $title, $data, $flat );
+					break;
+				case 'DELETE':
+					$this->doDelete( $title, $data, $flat );
+					break;
+				default:
+					$this->dieUsage( 'Unsupported method', 'unsupported-method', 501 );
+					break;
+			}
+		}  catch (\UsageException $e) {
+			throw $e;
+		} catch (\Exception $e) {
+			$this->dieUsage( 'Caught exception: $e', 'templaterest-caught-exception', 500 );
 		}
 	}
 
@@ -94,7 +100,7 @@ class ApiTemplateRest extends \ApiBase
 		} else if ( isset( $wgVisualEditorParsoidURL ) ) {
 			$url = $wgVisualEditorParsoidURL;
 		} else {
-			$this->dieUsage( 'Parsoid URL not configured!' );
+			$this->dieUsage( 'Parsoid URL not configured!', 'templaterest-parsoid-url',  500 );
 		}
 
 		if ( isset($wgParsoidDomain) ) {
@@ -102,7 +108,7 @@ class ApiTemplateRest extends \ApiBase
 		} else if ( isset( $wgVisualEditorParsoidPrefix ) ) {
 			$domain = $wgVisualEditorParsoidPrefix;
 		} else {
-			$this->dieUsage( 'Wiki domain for parsoid not configured!' );
+			$this->dieUsage( 'Wiki domain for parsoid not configured!', 'templaterest-parsoid-domain', 500 );
 		}
 
 		$this->parsoid = new HTTPParsoid( '\MWHttpRequest::factory', $url, $domain );
@@ -114,6 +120,7 @@ class ApiTemplateRest extends \ApiBase
 			$revision = $wikiPage->getRevision()->getId();
 		}
 		$xhtml = $this->parsoid->getPageXhtml( $title, $revision );
+
 		$model = new DOMDocumentArticle();
 		$model->setXhtml( $xhtml, $revision );
 		return $model;
@@ -175,13 +182,11 @@ class ApiTemplateRest extends \ApiBase
 		
 		$model = $this->getModelCheckEditPossible( $title, $data );
 
-		$this->getResult()->addValue( null, 'revision', $model->getRevision() );
-
 		$updatedTransclusions = array();
 
 		 $doIt = function( $what, $model, $target, $instances, &$updatedTransclusions ) {
 			if ( !is_array( $instances ) ) {
-				$this->dieUsage( 'Transclusion parameter must be a map.', 'transclusions-parameter-must-be-array' );
+				$this->dieUsage( 'Transclusion parameter must be a map.', 'transclusions-parameter-must-be-array', 400 );
 			}
 			foreach ( $instances as $parameters ) {
 
@@ -200,7 +205,6 @@ class ApiTemplateRest extends \ApiBase
 				$doIt( $what, $model, $target, $instances, $updatedTransclusions );
 			}
 		}
-
 
 		if ( isset($data['attributes']) ) {
 			$transclusions = array();
@@ -229,6 +233,7 @@ class ApiTemplateRest extends \ApiBase
 			$this->save( $title, $model, $data, $summaryMessage, $updatedTransclusions );
 		}
 
+		$this->getResult()->addValue( null, 'revision', $model->getRevision() );
 		$this->addModelToResult( $title, $model, $flat );
 
 	}
@@ -259,7 +264,7 @@ class ApiTemplateRest extends \ApiBase
 		$this->doSomething( $title, $data, 'templaterest-delete-templates', function( $model, $target, $index, $parameters, &$updatedTransclusions ) {
 
 				if ( $index === null || ! \is_int( $index ) ) {
-					$this->dieUsageMessage( 'templaterest-index-parameter-missing-or-invalid' );
+					$this->dieUsage( 'Index parameter missing or invalid', 'templaterest-index-parameter-missing-or-invalid', 400 );
 				}
 
 				if ( $model->removeTransclusion( $target, $index ) ) {
@@ -303,12 +308,12 @@ class ApiTemplateRest extends \ApiBase
 
 	private function getModelCheckEditPossible( $title, $data ) {
 		if ( ! $this->getUser()->isAllowed( 'edit' ) ) {
-			$this->dieUsageMsg( 'badaccess-groups' );
+			$this->dieUsage( 'Permission denied!', 'badaccess-groups', 403 );
 		}
 		$wikiPage = \WikiPage::factory( \Title::newFromText( $title ) );
 		$revision = $wikiPage->getRevision()->getId();
 		if ( $data['revision'] != $revision && ! (isset( $data['force'] ) && $data['force']) ) {
-			$this->dieUsage( "Revision mismatch.  Current revision is $revision, model revision is {$data['revision']}." . print_r( $data, true ), 'revision-mismatch' );
+			$this->dieUsage( "Revision mismatch.  Current revision is $revision, model revision is {$data['revision']}." . print_r( $data, true ), 'revision-mismatch', 409 );
 		}
 		return $this->getModel( $title, $revision );
 	}
@@ -335,8 +340,10 @@ class ApiTemplateRest extends \ApiBase
 
 		if ( ! $status->isOK() ) {
 			$this->getResult()->addValue( null, 'error', $status->getHTML() );
-			$this->dieUsage( "Failed to save modified article.", 'save-failed' );
+			$this->dieUsage( "Failed to save modified article.", 'save-failed', 500 );
 		}
+
+		$model->setRevision( $wikiPage->getRevision()->getId() );
 	}
 
 	private function validateTransclusion( $target, $parameters ) {
@@ -344,18 +351,18 @@ class ApiTemplateRest extends \ApiBase
 
 		if ( isset($parameters['index']) ) {
 			if (!is_int( $parameters['index'] ) && $parameters['index'] >= 0 ) {
-				$this->dieUsage( "Invalid index.", 'invalid-index' );
+				$this->dieUsage( "Invalid index.", 'invalid-index', 400 );
 			}
 		} else {
 			$parameters['index'] = 0;
 		}
 
 		if ( !isset($parameters['params']) ) {
-			$this->dieUsage( "The transclusion parameters are not set on transclusion $target.", 'transclusion-params-not-set' );
+			$this->dieUsage( "The transclusion parameters are not set on transclusion $target.", 'transclusion-params-not-set', 400 );
 		}
 
 		if ( !is_array($parameters['params']) ) {
-			$this->dieUsage( "The transclusion parameters must be a map.", 'invalid-parameters-not-array' );
+			$this->dieUsage( "The transclusion parameters must be a map.", 'invalid-parameters-not-array', 400 );
 		}
 
 		if ( count($parameters) > 2 ) {
@@ -369,12 +376,12 @@ class ApiTemplateRest extends \ApiBase
 						$unknown[] = $param;
 				}
 			}
-			$this->dieUsageMsg( 'Unknown parameters in transclusion data: ' . implode( ', ', $unknown ), 'unknown-parameters' );
+			$this->dieUsageMsg( 'Unknown parameters in transclusion data: ' . implode( ', ', $unknown ), 'unknown-parameters', 400 );
 		}
 
 		foreach ( $parameters['params'] as $key => $value ) {
 			if ( !isset( $value['wt'] ) ) {
-				$this->dieUsage( "The parameter value is not set on parameter $key of transclusion $target-{$parameters['index']}.", 'parameter-value-not-set');
+				$this->dieUsage( "The parameter value is not set on parameter $key of transclusion $target-{$parameters['index']}.", 'parameter-value-not-set', 400);
 			}
 		}
 
