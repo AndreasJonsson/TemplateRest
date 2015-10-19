@@ -130,7 +130,7 @@ class HTTPParsoid implements Parsoid
 	}
 
 	private function pageName( $pageName ) {
-		$title = Title::newFromText( $pageName );
+		$title = \Title::newFromText( $pageName );
 		return urlencode( $title->getPrefixedDbKey() );
 	}
 
