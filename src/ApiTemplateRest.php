@@ -123,7 +123,11 @@ class ApiTemplateRest extends \ApiBase
 	private function getModel( $title, $revision = null ) {
 		if ( $revision == null ) {
 			$wikiPage = \WikiPage::factory( \Title::newFromText( $title ) );
-			$revision = $wikiPage->getRevision()->getId();
+			$rev = $wikiPage->getRevision();
+			if ($rev == null) {
+				$this->dieUsage("No existing revision for the article '$title'");
+			}
+			$revision = $rev->getId();
 		}
 		$xhtml = $this->parsoid->getPageXhtml( $title, $revision );
 
@@ -317,7 +321,11 @@ class ApiTemplateRest extends \ApiBase
 			$this->dieUsage( 'Permission denied!', 'badaccess-groups', 403 );
 		}
 		$wikiPage = \WikiPage::factory( \Title::newFromText( $title ) );
-		$revision = $wikiPage->getRevision()->getId();
+		$rev = $wikiPage->getRevision();
+		if ($rev === null) {
+			$this->dieUsage( "No existing revision of the article '$title'." );
+		}
+		$revision = $rev->getId();
 		if ( $data['revision'] != $revision && ! (isset( $data['force'] ) && $data['force']) ) {
 			$this->dieUsage( "Revision mismatch.  Current revision is $revision, model revision is {$data['revision']}." . print_r( $data, true ), 'revision-mismatch', 409 );
 		}
