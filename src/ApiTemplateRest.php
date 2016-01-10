@@ -68,7 +68,7 @@ class ApiTemplateRest extends \ApiBase
 					$this->dieUsage( 'Unsupported method', 'unsupported-method', 501 );
 					break;
 			}
-		}  catch (\UsageException $e) {
+		} catch (\UsageException $e) {
 			throw $e;
 		} catch (\Exception $e) {
 			$this->dieUsage( "Caught exception: $e", 'templaterest-caught-exception', 500 );

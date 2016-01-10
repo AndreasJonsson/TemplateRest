@@ -185,6 +185,9 @@ class DOMDocumentArticle implements Article
 			foreach ( $data['parts'] as $part ) {
 				if (isset( $part['template'] )) {
 					$target = $this->getTarget($part['template']['target']);
+					if ($target === null) {
+						continue;
+					}
 					if ( !isset( $this->transclusions[$target] ) ) {
 						$this->transclusions[$target] = array();
 					}
@@ -207,7 +210,12 @@ class DOMDocumentArticle implements Article
 		} else {
 			$target = $targetObj['wt'];
 		}
-		return \Title::newFromText( $target, NS_TEMPLATE )->getText();
+		$title = \Title::newFromText( $target, NS_TEMPLATE );
+		if ($title === null) {
+			return null;
+		}
+
+		return $title->getText();
 	}
 
 	private function getTemplateNumber() {

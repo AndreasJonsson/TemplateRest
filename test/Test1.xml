@@ -1,6 +1,6 @@
 <body prefix="mw: http://mediawiki.org/rdf/
       mwns10: http://en.wikipedia.org/wiki/Template%58">
-  
+
 <span typeof="mw:Transclusion" about="#mwt1"
   data-mw='{"parts": [{"template":{"target":{"wt":"foo"},"params":{"1":{"wt":"unused value"},"paramname":{"wt":"used value"}},"i":0}}]}'>
   Some text content
