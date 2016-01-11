@@ -76,6 +76,40 @@ interface Article
 	 */
 	function removeTransclusion( $target, $id );
 
+
+	/**
+	 * Get the editable set of categories.
+	 *
+	 * @return array The array of editable categories in normalized form (without category namespace prefix).
+	 */
+	function getEditableCategories();
+
+	/**
+	 * Get the read-only set of categories of this article.
+	 *
+	 * @return array The array of editable categories in normalized form (without category namespace prefix).
+	 */
+	function getReadonlyCategories();
+
+	/**
+	 * Set the editable set of categories of this article.
+	 *
+	 * @param array $categories The categories to set.
+	 *
+	 * @return int The number of categories added and removed.
+	 */
+	function setEditableCategories( $categories );
+
+	/**
+	 * Remove a set of editable categories, if present.
+	 *
+	 * @param array $categories The categories to remove.
+	 *
+	 * @return int The number of categories removed.
+	 */
+	function removeEditableCategories( $categories );
+	
+
 	/**
 	 * @return int The revision of the article.
 	 */

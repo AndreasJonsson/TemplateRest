@@ -9,6 +9,7 @@
         "apihelp-templaterest-description": "Restful service for editing template transclusions.",
         "apihelp-templaterest-param-title": "Title of page to edit.",
         "apihelp-templaterest-param-structured": "Use structed format on generated data.  Default: false.  When false, the result will contain a parameter attributes with attributes on the form <urlencoded template name>/<index>/<urlencoded parameter name>, when true, the result will contain the parameter transclusions containing an associative array describing the structure of the transclusions.",
+        "apihelp-templaterest-param-withCategories": "Include categories.",
         "templaterest-put-templates": "Templaterest PUT transclusions.  The following template transclusions where updated or added: $1.",
         "templaterest-delete-templates": "Templaterest DELETE transclusions.  The following template transclusions where deleted: $1.",
         "templaterest-patch-templates": "Templaterest PATCH transclusions.  The following template transclusions where updated or added: $1."

@@ -31,9 +31,15 @@ class DOMDocumentArticle implements Article
 	 */
 	private $domDocument = null;
 
+	private $bodyElement;
+
 	private $transclusions;
 
 	private $revision;
+
+	private $editableCategories;
+
+	private $readonlyCategories;
 
 	/**
 	 * Set the xhtml contents of the article.
@@ -47,6 +53,8 @@ class DOMDocumentArticle implements Article
 		$this->domDocument->preserveWhiteSpace = true;
 		$this->domDocument->loadXML( $xhtml );
 
+		$this->bodyElement = $this->domDocument->getElementsByTagName('body')->item(0);
+
 		$xpath = new \DOMXpath( $this->domDocument );
 
 		$transclusionElements = $xpath->query( '//body//*[contains(concat(" ", normalize-space(@typeof), " "), " mw:Transclusion ")]' );
@@ -56,6 +64,16 @@ class DOMDocumentArticle implements Article
 		foreach ($transclusionElements as $transclusionElement) {
 			$this->addTransclusionElement( $transclusionElement );
 		}
+
+		$categoryElements = $xpath->query( '//body//link[@rel="mw:PageProp/Category"]' );
+
+		$this->readonlyCategories = array();
+		$this->editableCategories = array();
+
+		foreach ($categoryElements as $categoryElement) {
+			$this->addCategoryElement( $categoryElement );
+		}
+
 	}
 
 	/**
@@ -63,7 +81,7 @@ class DOMDocumentArticle implements Article
 	 */
 	public function getXhtml( )
 	{
-		return $this->domDocument->saveXML( $this->domDocument->getElementsByTagName( 'body' )->item( 0 ) );
+		return $this->domDocument->saveXML( $this->bodyElement );
 	}
 
 	/**
@@ -133,7 +151,7 @@ class DOMDocumentArticle implements Article
 			);
 
 			$e->setAttribute('data-mw', \json_encode( $data ) );
-			$body = $this->domDocument->getElementsByTagName( 'body' )->item(0);
+			$body = $this->bodyElement;
 			$body->appendChild( $this->domDocument->createTextNode( "\n\n" ) );
 			$body->appendChild( $e );
 			$body->appendChild( $this->domDocument->createTextNode( "\n\n" ) );
@@ -202,6 +220,113 @@ class DOMDocumentArticle implements Article
 				$i++;
 			}
 		}
+	}
+
+	private function addCategoryElement( $categoryElement ) {
+		$typeof = $categoryElement->getAttribute('typeof');
+
+		if (!$typeof) {
+			try {
+				$this->editableCategories[$this->getNormalizedCategoryFromElement( $categoryElement )] = $categoryElement;
+			} catch (Exception $e) {
+				wfDebug("TemplateRest DOMDocumentArticle when adding editable category: " . $e . "\n");
+			}
+		} else {
+			try {
+				$this->readonlyCategories[] = $this->getNormalizedCategoryFromElement( $categoryElement );
+			} catch (Exception $e) {
+				wfDebug("TemplateRest DOMDocumentArticle when adding readonly category: " . $e . "\n");
+			}
+		}
+	}
+
+	public function getReadOnlyCategories() {
+		return $this->readonlyCategories;
+	}
+
+	public function getEditableCategories() {
+		return array_keys( $this->editableCategories );
+	}
+
+	public function setEditableCategories( $editableCategories ) {
+		$normalized = array();
+		$current = $this->getEditableCategories();
+		$added = array();
+		foreach ($editableCategories as $editableCategory) {
+			$nc = $this->getNormalizedCategory($editableCategory);
+			$normalized[] = $nc;
+			$found = false;
+			for ($i = 0; $i < count($current); $i++) {
+				$c = $current[$i];
+				if ($c == $nc) {
+					$found = true;
+					array_splice( $current, $i, 1 );
+					break;
+				}
+			}
+			if (!$found) {
+				$added[] = $nc;
+			}
+		}
+		$removed = $current;
+		foreach ($removed as $r) {
+			$element = $this->editableCategories[$r];
+			$element->parentNode->removeChild( $element );
+			unset($this->editableCategories[$r]);
+		}
+		foreach ($added as $a) {
+			$title = \Title::newFromText( $a, NS_CATEGORY );
+			$element = $this->domDocument->createElement( 'link' );
+			$element->setAttribute('rel', 'mw:PageProp/Category');
+			$element->setAttribute('href', $title->getPrefixedDBKey());
+			$this->editableCategories[$a] = $element;
+			$this->bodyElement->appendChild( $element );
+		}
+		return count($added) + count($removed);
+	}
+
+	public function removeEditableCategories( $categories ) {
+		$current = $this->getEditableCategories();
+		foreach ($categories as $c) {
+			$nc = $this->getNormalizedCategory( $c );
+			for ($i = 0; $i < count($current); $i++) {
+				if ($current[$i] == $nc) {
+					$found = true;
+					array_splice( $current, $i, 1 );
+					break;
+				}
+			}
+		}
+		return $this->setEditableCategories( $current );
+	}
+
+	private function getNormalizedCategoryFromElement( $categoryElement ) {
+		$data = $categoryElement->getAttribute('data-parsoid');
+		if (!$data) {
+			throw \Exception("No data-parsoid attribute!");
+		}
+		$data = \json_decode( $data );
+		if ($data == null) {
+			throw \Exception("data-parsoid attribute contains invalid json!");
+		}
+		if (!$data->sa) {
+			throw \Exception("data-parsoid attribute does not have sa attribute!");
+		}
+		if (!$data->sa->href) {
+			throw \Exception("data-parsoid attribute does not have href attribute!");
+		}
+		return $this->getNormalizedCategory( $data->sa->href );
+	}
+
+	private function getNormalizedCategory( $categoryText ) {
+		$title = \Title::newFromText( $categoryText, NS_CATEGORY );
+		if ($title == null) {
+			throw \Exception("The category text is not a valid title!");
+		}
+		if ($title->getNamespace() != NS_CATEGORY ) {
+			throw \Exception("The category text is not a category!");
+		}
+		return $title->getText();
 	}
 
 	private function getTarget( $targetObj ) {

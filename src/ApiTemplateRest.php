@@ -88,6 +88,12 @@ class ApiTemplateRest extends \ApiBase
 				\ApiBase::PARAM_REQUIRED => false,
 				\ApiBase::PARAM_ISMULTI => false,
 				\ApiBase::PARAM_DFLT => false
+			),
+			'withCategories' => array(
+				\ApiBase::PARAM_TYPE => 'boolean',
+				\ApiBase::PARAM_REQUIRED => false,
+				\ApiBase::PARAM_ISMULTI => false,
+				\ApiBase::PARAM_DFLT => false
 			)
 		);
 	}
@@ -178,6 +184,12 @@ class ApiTemplateRest extends \ApiBase
 		}
 		
 		$this->getResult()->addValue( null, $key, $result );
+
+		if ( $this->getParameter( 'withCategories' ) ) {
+			$this->getResult()->addValue( null, 'editableCategories', $model->getEditableCategories() );
+			$this->getResult()->addValue( null, 'readonlyCategories', $model->getReadonlyCategories() );
+		}
+
 	}
 
 	private function doGet( $title, $data, $flat ) {
@@ -188,7 +200,7 @@ class ApiTemplateRest extends \ApiBase
 		$this->addModelToResult( $title, $model, $flat );
 	}
 
-	private function doSomething( $title, $data, $summaryMessage, $what, $flat ) {
+	private function doSomething( $title, $data, $summaryMessage, $what, $flat, $processCategories ) {
 		
 		$model = $this->getModelCheckEditPossible( $title, $data );
 
@@ -239,8 +251,15 @@ class ApiTemplateRest extends \ApiBase
 			}
 		}
 
-		if ( count( $updatedTransclusions ) > 0 ) {
-			$this->save( $title, $model, $data, $summaryMessage, $updatedTransclusions );
+		if ( $this->getParameter('withCategories') && isset($data['editableCategories']) ) {
+			$updatedCategories = call_user_func_array( $processCategories, array($model, $data['editableCategories']) );
+		} else {
+			$updateCategories = 0;
+		}
+
+
+		if ( count( $updatedTransclusions ) > 0 || $updatedCategories > 0) {
+			$this->save( $title, $model, $data, $summaryMessage, $updatedTransclusions, $updatedCategories );
 		}
 
 		$this->getResult()->addValue( null, 'revision', $model->getRevision() );
@@ -266,7 +285,9 @@ class ApiTemplateRest extends \ApiBase
 					$transclusion->setParameters( $parameters['params'] );
 				}
 
-			}, $flat);
+			}, $flat, function ( $model, $editableCategories ) {
+				return $model->setEditableCategories($editableCategories);
+			});
 	}
 
 	private function doDelete( $title, $data, $flat ) {
@@ -281,7 +302,9 @@ class ApiTemplateRest extends \ApiBase
 					$updatedTransclusions[] = $target . '-' . $index;
 				}
 
-			}, $flat);
+			}, $flat, function ( $model, $editableCategories ) {
+				return $model->removeEditableCategories( $editableCategories );
+			});
 
 	}
 
@@ -312,7 +335,9 @@ class ApiTemplateRest extends \ApiBase
 					$transclusion->setParameters( $oldParameters );
 				}
 
-			}, $flat);
+			}, $flat, function ( $model, $editableCategories ) {
+				return $model->setEditableCategories(array_merge($model->getEditableCategories(), $editableCategories));
+			});
 
 	}
 
@@ -332,7 +357,7 @@ class ApiTemplateRest extends \ApiBase
 		return $this->getModel( $title, $revision );
 	}
 
-	private function save( $pageName, $model, $data, $summaryMessage, $updatedTransclusions ) {
+	private function save( $pageName, $model, $data, $summaryMessage, $updatedTransclusions, $updatedCategories ) {
 
 		$title = \Title::newFromText( $pageName );
 
