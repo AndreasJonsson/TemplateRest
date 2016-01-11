@@ -303,17 +303,17 @@ class DOMDocumentArticle implements Article
 	private function getNormalizedCategoryFromElement( $categoryElement ) {
 		$data = $categoryElement->getAttribute('data-parsoid');
 		if (!$data) {
-			throw \Exception("No data-parsoid attribute!");
+			throw new \Exception("No data-parsoid attribute!");
 		}
 		$data = \json_decode( $data );
 		if ($data == null) {
-			throw \Exception("data-parsoid attribute contains invalid json!");
+			throw new \Exception("data-parsoid attribute contains invalid json!");
 		}
 		if (!$data->sa) {
-			throw \Exception("data-parsoid attribute does not have sa attribute!");
+			throw new \Exception("data-parsoid attribute does not have sa attribute!");
 		}
 		if (!$data->sa->href) {
-			throw \Exception("data-parsoid attribute does not have href attribute!");
+			throw new \Exception("data-parsoid attribute does not have href attribute!");
 		}
 		return $this->getNormalizedCategory( $data->sa->href );
 	}
@@ -321,10 +321,10 @@ class DOMDocumentArticle implements Article
 	private function getNormalizedCategory( $categoryText ) {
 		$title = \Title::newFromText( $categoryText, NS_CATEGORY );
 		if ($title == null) {
-			throw \Exception("The category text is not a valid title!");
+			throw new \Exception("The category text is not a valid title!");
 		}
 		if ($title->getNamespace() != NS_CATEGORY ) {
-			throw \Exception("The category text is not a category!");
+			throw new \Exception("The category text is not a category!");
 		}
 		return $title->getText();
 	}
