@@ -228,13 +228,13 @@ class DOMDocumentArticle implements Article
 		if (!$typeof) {
 			try {
 				$this->editableCategories[$this->getNormalizedCategoryFromElement( $categoryElement )] = $categoryElement;
-			} catch (Exception $e) {
+			} catch (\Exception $e) {
 				wfDebug("TemplateRest DOMDocumentArticle when adding editable category: " . $e . "\n");
 			}
 		} else {
 			try {
 				$this->readonlyCategories[] = $this->getNormalizedCategoryFromElement( $categoryElement );
-			} catch (Exception $e) {
+			} catch (\Exception $e) {
 				wfDebug("TemplateRest DOMDocumentArticle when adding readonly category: " . $e . "\n");
 			}
 		}
