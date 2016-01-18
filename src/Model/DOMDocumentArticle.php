@@ -254,6 +254,11 @@ class DOMDocumentArticle implements Article
 		$added = array();
 		foreach ($editableCategories as $editableCategory) {
 			$nc = $this->getNormalizedCategory($editableCategory);
+			foreach ($normalized as $n0) {
+				if ($nc == $n0) {
+					continue 2;
+				}
+			}
 			$normalized[] = $nc;
 			$found = false;
 			for ($i = 0; $i < count($current); $i++) {
@@ -282,6 +287,7 @@ class DOMDocumentArticle implements Article
 			$this->editableCategories[$a] = $element;
 			$this->bodyElement->appendChild( $element );
 		}
+
 		return count($added) + count($removed);
 	}
 
@@ -340,7 +346,7 @@ class DOMDocumentArticle implements Article
 			return null;
 		}
 
-		return $title->getText();
+		return $title->getDBkey();
 	}
 
 	private function getTemplateNumber() {

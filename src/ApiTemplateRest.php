@@ -178,17 +178,20 @@ class ApiTemplateRest extends \ApiBase
 		if ($flatten) {
 			$result = $this->flatModel( $title, $model );
 			$key = 'attributes';
+			if ( $this->getParameter( 'withCategories' ) ) {
+				$result['editableCategories'] = $model->getEditableCategories();
+				$result['readonlyCategories'] = $model->getReadonlyCategories();
+			}
 		} else {
 			$result = $this->structuredModel( $title, $model );
 			$key = 'transclusions';
+			if ( $this->getParameter( 'withCategories' ) ) {
+				$this->getResult()->addValue( null, 'editableCategories', $model->getEditableCategories() );
+				$this->getResult()->addValue( null, 'readonlyCategories', $model->getReadonlyCategories() );
+			}
 		}
 		
 		$this->getResult()->addValue( null, $key, $result );
-
-		if ( $this->getParameter( 'withCategories' ) ) {
-			$this->getResult()->addValue( null, 'editableCategories', $model->getEditableCategories() );
-			$this->getResult()->addValue( null, 'readonlyCategories', $model->getReadonlyCategories() );
-		}
 
 	}
 
@@ -251,10 +254,14 @@ class ApiTemplateRest extends \ApiBase
 			}
 		}
 
-		if ( $this->getParameter('withCategories') && isset($data['editableCategories']) ) {
-			$updatedCategories = call_user_func_array( $processCategories, array($model, $data['editableCategories']) );
-		} else {
-			$updateCategories = 0;
+		$updatedCategories = 0;
+
+		if ( $this->getParameter('withCategories') )  {
+			if ($flat && isset($data['attributes']['editableCategories'])) {
+				$updatedCategories = call_user_func_array( $processCategories, array($model, $data['attributes']['editableCategories']) );
+			} else if (isset($data['editableCategories'])) {
+				$updatedCategories = call_user_func_array( $processCategories, array($model, $data['editableCategories']) );
+			}
 		}
 
 
@@ -336,7 +343,7 @@ class ApiTemplateRest extends \ApiBase
 				}
 
 			}, $flat, function ( $model, $editableCategories ) {
-				return $model->setEditableCategories(array_merge($model->getEditableCategories(), $editableCategories));
+				return $model->setEditableCategories($editableCategories);
 			});
 
 	}
