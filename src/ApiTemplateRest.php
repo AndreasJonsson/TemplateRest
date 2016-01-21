@@ -99,9 +99,18 @@ class ApiTemplateRest extends \ApiBase
 	}
 
 	private function init() {
-		global $wgParsoidURL, $wgVisualEditorParsoidURL, $wgParsoidDomain, $wgVisualEditorParsoidPrefix;
+		global $wgParsoidURL, $wgVisualEditorParsoidURL, $wgParsoidDomain, $wgVisualEditorParsoidPrefix, $wgVirtualRestConfig;
 
-		if ( isset( $wgParsoidURL ) ) {
+
+		if (isset($wgVirtualRestConfig['modules']['parsoid'])) {
+			$module = $wgVirtualRestConfig['modules']['parsoid'];
+		} else {
+			$module = array();
+		}
+
+		if ( isset( $module['url'] ) ) {
+			$url = $module['url'];
+		} else if ( isset( $wgParsoidURL ) ) {
 			$url = $wgParsoidURL;
 		} else if ( isset( $wgVisualEditorParsoidURL ) ) {
 			$url = $wgVisualEditorParsoidURL;
@@ -109,7 +118,9 @@ class ApiTemplateRest extends \ApiBase
 			$this->dieUsage( 'Parsoid URL not configured!', 'templaterest-parsoid-url',  500 );
 		}
 
-		if ( isset($wgParsoidDomain) ) {
+		if ( isset( $module['domain'] ) ) {
+			$domain = $module['domain'];
+		} else if ( isset($wgParsoidDomain) ) {
 			$domain = $wgParsoidDomain;
 		} else if ( isset( $wgVisualEditorParsoidPrefix ) ) {
 			$domain = $wgVisualEditorParsoidPrefix;
@@ -117,12 +128,13 @@ class ApiTemplateRest extends \ApiBase
 			$this->dieUsage( 'Wiki domain for parsoid not configured!', 'templaterest-parsoid-domain', 500 );
 		}
 
-		if ( isset($wgVisualEditorParsoidPrefix) ) {
+		if ( isset( $module['prefix'] ) ) {
+			$prefix = $module['prefix'];
+		} else if ( isset($wgVisualEditorParsoidPrefix) ) {
 			$prefix = $wgVisualEditorParsoidPrefix;
 		} else {
 			$this->dieUsage( 'Wiki prefix for parsoid not configured!', 'templaterest-parsoid-prefix', 500 );
 		}
-
 		$this->parsoid = new HTTPParsoid( '\MWHttpRequest::factory', $url, $domain, $prefix );
 	}
 

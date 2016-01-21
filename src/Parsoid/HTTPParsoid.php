@@ -67,9 +67,9 @@ class HTTPParsoid implements Parsoid
 
         $factory = $this->requestFactory;
 
-		$rev = $revision == null ? '' : '?oldid=' . $revision ;
+		$rev = $revision == null ? '' : '/' . $revision ;
 
-		$url = $this->url . '/' . $this->prefix . '/'  . $this->pageName($pageName) . $rev;
+		$url = $this->url . '/' . $this->domain . '/v3/page/html/' . $this->pageName($pageName) . $rev . '?body_only=true';
 
         $request = call_user_func($factory,  $url, array( 'method' => 'get',  'followRedirects' => true ));
 
@@ -100,7 +100,7 @@ class HTTPParsoid implements Parsoid
 
         $factory = $this->requestFactory;
 
-		$url = $this->url . '/' . $this->prefix . '/'  . $this->pageName($pageName);
+		$url = $this->url . '/' . $this->domain . '/v3/transform/html/to/wikitext/' . $this->pageName($pageName);
 
         $request = call_user_func($factory, $url, array( 'method' => 'post',  'followRedirects' => true ) );
 
@@ -108,6 +108,7 @@ class HTTPParsoid implements Parsoid
 			\wfArrayToCgi(
 				array(
 					'html' => $pageXhtml,
+					'body_only' => 'true'
 				)
 			)
 		);
