@@ -18,6 +18,10 @@ class Title {
 	public function getText()  {
 		return $this->text;
 	}
+
+	public function getDBKey() {
+		return $this->text;
+	}
 }
 
 
