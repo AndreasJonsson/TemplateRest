@@ -14,11 +14,11 @@ Template rest is a RESTful API module that takes advantage of a [Parsoid server]
 
 The entry point to the API will be depending on the settings of $wgScriptPath of your MediaWiki installation.
 
-   $wgServer/$wgScriptPath/api.php?action=templaterest
+    $wgServer/$wgScriptPath/api.php?action=templaterest
 
 Example:
 
-   http://example.com/w/api.php?action=templaterest&title=Animal_Farm&structured=1
+    http://example.com/w/api.php?action=templaterest&title=Animal_Farm&structured=1
 
 ## Query parameters
 
@@ -60,13 +60,13 @@ The model extends Backbone.Model and is exposed to the global environment via th
 
 Example usage:
 
- var transclusions = new mw.templaterest.PageTransclusions({ title: 'Animal Farm' });
- transclusions.fetch();
- transclusions.setTransclusionParameter( 'Infobox book', 0, 'title', 'Animal Farm' );
- transclusions.setTransclusionParameter( 'Infobox book', 0, 'author', '[[George Orwell]]' );
- transclusions.setTransclusionParameter( 'Infobox book', 0, 'published', '17 August 1945' );
- transclusions.on('sync', function() { alert('Successfully updated page'); });
- transclusions.on('error', function() { alert('Failed to update page'); });
- transclusions.save();
+    var transclusions = new mw.templaterest.PageTransclusions({ title: 'Animal Farm' });
+    transclusions.fetch();
+    transclusions.setTransclusionParameter( 'Infobox book', 0, 'title', 'Animal Farm' );
+    transclusions.setTransclusionParameter( 'Infobox book', 0, 'author', '[[George Orwell]]' );
+    transclusions.setTransclusionParameter( 'Infobox book', 0, 'published', '17 August 1945' );
+    transclusions.on('sync', function() { alert('Successfully updated page'); });
+    transclusions.on('error', function() { alert('Failed to update page'); });
+    transclusions.save();
 
 Please see the [backbone documentation](http://backbonejs.org/) for details.
