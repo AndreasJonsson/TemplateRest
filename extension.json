@@ -1,0 +1,41 @@
+{
+   "name" : "TemplateRest",
+   "author" : [
+      "Andreas Jonsson"
+   ],
+   "version" : "1.1",
+   "url" : "https://kreablo.se",
+   "license-name" : "GPL-3.0",
+   "type" : "other",
+   "MessagesDirs" : {
+      "TemplateRest" : [
+         "i18n"
+      ]
+   },
+   "ResourceFileModulePaths" : {
+      "localBasePath" : "",
+      "remoteExtPath" : "TemplateRest"
+   },
+   "ResourceModules" : {
+      "ext.templaterest.pagetransclusions" : {
+         "dependencies" : [
+            "ext.jsmodules.backbone"
+         ],
+         "scripts" : [
+            "modules/templaterest/pagetransclusions.js"
+         ]
+      }
+   },
+   "APIModules" : {
+      "templaterest" : "TemplateRest\\ApiTemplateRest"
+   },
+   "AutoLoadClasses" : {
+      "ApiTemplateRest" : "src/ApiTemplateRest.php",
+      "Model\\Article" : "src/Model/Article.php",
+      "Model\\DOMDocumentArticle" : "src/Model/DOMDocumentArticle.php",
+      "Model\\DOMElementTransclusion" : "src/Model/DOMElementTransclusion.php",
+      "Model\\Transclusion" : "src/Model/Transclusion.php",
+      "Parsoid\\HTTPParsoid" : "src/Parsoid/HTTPParsoid.php",
+      "Parsoid\\Parsoid" : "src/Parsoid/Parsoid.php"
+   }
+}
