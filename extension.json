@@ -27,15 +27,15 @@
       }
    },
    "APIModules" : {
-      "templaterest" : "TemplateRest\\ApiTemplateRest"
+      "templaterest" : "\\TemplateRest\\ApiTemplateRest"
    },
-   "AutoLoadClasses" : {
-      "ApiTemplateRest" : "src/ApiTemplateRest.php",
-      "Model\\Article" : "src/Model/Article.php",
-      "Model\\DOMDocumentArticle" : "src/Model/DOMDocumentArticle.php",
-      "Model\\DOMElementTransclusion" : "src/Model/DOMElementTransclusion.php",
-      "Model\\Transclusion" : "src/Model/Transclusion.php",
-      "Parsoid\\HTTPParsoid" : "src/Parsoid/HTTPParsoid.php",
-      "Parsoid\\Parsoid" : "src/Parsoid/Parsoid.php"
+   "AutoloadClasses" : {
+      "TemplateRest\\ApiTemplateRest" : "src/ApiTemplateRest.php",
+      "TemplateRest\\Model\\Article" : "src/Model/Article.php",
+      "TemplateRest\\Model\\DOMDocumentArticle" : "src/Model/DOMDocumentArticle.php",
+      "TemplateRest\\Model\\DOMElementTransclusion" : "src/Model/DOMElementTransclusion.php",
+      "TemplateRest\\Model\\Transclusion" : "src/Model/Transclusion.php",
+      "TemplateRest\\Parsoid\\HTTPParsoid" : "src/Parsoid/HTTPParsoid.php",
+      "TemplateRest\\Parsoid\\Parsoid" : "src/Parsoid/Parsoid.php"
    }
 }

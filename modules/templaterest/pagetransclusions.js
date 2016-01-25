@@ -4,8 +4,14 @@
 
         pageRevision: null,
 
+        withCategories: false,
+
         url: function() {
-            return mw.util.wikiScript('api') + '?action=templaterest&format=json&title=' + encodeURIComponent(this.get('id'));
+            var url = mw.util.wikiScript('api') + '?action=templaterest&format=json&title=' + encodeURIComponent(this.get('id'));
+            if (this.withCategories) {
+                url += "&withCategories=true";
+            }
+            return url;
         },
 
         parse: function ( attributes, options ) {
