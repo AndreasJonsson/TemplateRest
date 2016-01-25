@@ -1,0 +1,16 @@
+{
+	"@metadata": {
+		"authors": [
+			"Andreas Jonsson"
+		]
+	},
+        "templaterest": "TemplateRest",
+        "templaterest-desc": "Webbapi för redigering av malltransklusion baserat på \"restful\" principen.",
+        "apihelp-templaterest-description": "Webbapi för redigering av malltransklusion baserat på \"restful\" principen.",
+        "apihelp-templaterest-param-title": "Titel på sidan som skall behandlas.",
+        "apihelp-templaterest-param-structured": "Datamodellen har en strukturerad form med nästlade objekt.  Värde om inget annat anges: false.  Om ej satt kommer resultatet att innehålla parameterattribut med namn på formen <urlkodat mallnamn>/<index>/<urlkodat parameternamn>.  Den strukturerade formen har attributet 'transclusions' satt med en associativ array vilken beskriver strukturen hos transklusionerna.",
+        "apihelp-templaterest-param-withCategories": "Ta med kategorier i behandlingen.",
+        "templaterest-put-templates": "Templaterest PUT transklusioner.   Följande malltransklusioner uppdaterades eller lades till: $1.",
+        "templaterest-delete-templates": "Templaterest DELETE transklusioner.  Följande malltransklusioner har tagits bort: $1.",
+        "templaterest-patch-templates": "Templaterest PATCH transklusioner.  Följande malltransklusioner har uppdaterats eller lagts till: $1."
+}
