@@ -3,7 +3,7 @@
    "author" : [
       "Andreas Jonsson"
    ],
-   "version" : "1.1",
+   "version" : "1.2",
    "url" : "https://github.com/AndreasJonsson/TemplateRest",
    "license-name" : "GPL-3.0",
    "type" : "other",
@@ -35,7 +35,7 @@
       "TemplateRest\\Model\\DOMDocumentArticle" : "src/Model/DOMDocumentArticle.php",
       "TemplateRest\\Model\\DOMElementTransclusion" : "src/Model/DOMElementTransclusion.php",
       "TemplateRest\\Model\\Transclusion" : "src/Model/Transclusion.php",
-      "TemplateRest\\Parsoid\\HTTPParsoid" : "src/Parsoid/HTTPParsoid.php",
+      "TemplateRest\\Parsoid\\VirtualRESTParsoid" : "src/Parsoid/VirtualRESTParsoid.php",
       "TemplateRest\\Parsoid\\Parsoid" : "src/Parsoid/Parsoid.php"
    }
 }
